@@ -1,13 +1,23 @@
+/** @flow */
 import * as React from 'react';
-import {AutoSizer, InfiniteLoader, List} from 'react-virtualized';
-import proptypes from 'proptypes';
+import PropTypes from 'prop-types';
+import {
+  ContentBox,
+  ContentBoxHeader,
+  ContentBoxParagraph,
+} from '../demo/ContentBox';
+import Immutable from 'immutable';
+import AutoSizer from '../AutoSizer';
+import InfiniteLoader from './InfiniteLoader';
+import List from '../List';
+import styles from './InfiniteLoader.example.css';
 
 const STATUS_LOADING = 1;
 const STATUS_LOADED = 2;
 
-export default class MediaList extends React.PureComponent {
+export default class InfiniteLoaderExample extends React.PureComponent {
   static contextTypes = {
-    list: proptypes.array,
+    list: PropTypes.instanceOf(Immutable.List).isRequired,
   };
 
   constructor(props) {
@@ -38,19 +48,44 @@ export default class MediaList extends React.PureComponent {
     const {loadedRowCount, loadingRowCount} = this.state;
 
     return (
-      <div>
+      <ContentBox>
+        <ContentBoxHeader
+          text="InfiniteLoader"
+          sourceLink="https://github.com/bvaughn/react-virtualized/blob/master/source/InfiniteLoader/InfiniteLoader.example.js"
+          docsLink="https://github.com/bvaughn/react-virtualized/blob/master/docs/InfiniteLoader.md"
+        />
+
+        <ContentBoxParagraph>
+          This component manages just-in-time data fetching to ensure that the
+          all visible rows have been loaded. It also uses a threshold to
+          determine how early to pre-fetch rows (before a user scrolls to them).
+        </ContentBoxParagraph>
+
+        <ContentBoxParagraph>
+          <div className={styles.cacheButtonAndCountRow}>
+            <button className={styles.button} onClick={this._clearData}>
+              Flush Cached Data
+            </button>
+
+            <div className={styles.cacheCountRow}>
+              {loadingRowCount} loading, {loadedRowCount} loaded
+            </div>
+          </div>
+        </ContentBoxParagraph>
+
         <InfiniteLoader
           isRowLoaded={this._isRowLoaded}
           loadMoreRows={this._loadMoreRows}
-          rowCount={50}>
+          rowCount={list.size}>
           {({onRowsRendered, registerChild}) => (
             <AutoSizer disableHeight>
               {({width}) => (
                 <List
                   ref={registerChild}
+                  className={styles.List}
                   height={200}
                   onRowsRendered={onRowsRendered}
-                  rowCount={50}
+                  rowCount={list.size}
                   rowHeight={30}
                   rowRenderer={this._rowRenderer}
                   width={width}
@@ -59,7 +94,7 @@ export default class MediaList extends React.PureComponent {
             </AutoSizer>
           )}
         </InfiniteLoader>
-      </div>
+      </ContentBox>
     );
   }
 
@@ -115,6 +150,24 @@ export default class MediaList extends React.PureComponent {
   }
 
   _rowRenderer({index, key, style}) {
-    return (<div className="row" key={key}>{index} content</div>);
+    const {list} = this.context;
+    const {loadedRowsMap} = this.state;
+
+    const row = list.get(index);
+    let content;
+
+    if (loadedRowsMap[index] === STATUS_LOADED) {
+      content = row.name;
+    } else {
+      content = (
+        <div className={styles.placeholder} style={{width: row.size}} />
+      );
+    }
+
+    return (
+      <div className={styles.row} key={key} style={style}>
+        {content}
+      </div>
+    );
   }
 }
