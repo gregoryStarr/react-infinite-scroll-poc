@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import MediaList from './MediaListComponent/MediaList';
 import GList from "./MediaListComponent/GList";
 import Immutable from 'immutable'
 import {generateRandomList} from './utils';
