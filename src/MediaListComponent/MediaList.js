@@ -2,7 +2,7 @@ import React from 'react';
 import {AutoSizer, InfiniteLoader, List} from 'react-virtualized';
 import data from './data';
 
-const TOTAL = 50; // total of rows shown un the list
+const TOTAL = data.list.length; // total of rows shown un the list
 
 class MediaList extends React.Component {
   constructor() {

@@ -2,19 +2,20 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import MediaList from './MediaListComponent/MediaList';
+import GList from "./MediaListComponent/GList";
+import Immutable from 'immutable'
+import {generateRandomList} from './utils';
+
+
+const list = Immutable.List(generateRandomList());
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p>MediaList Component</p>
-        <MediaList/>
-
-      </div>
+        <div className="App">
+          <p>MediaList Component</p>
+            <GList list={list}/>
+        </div>
     );
   }
 }
